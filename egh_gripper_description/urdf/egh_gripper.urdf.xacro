@@ -46,13 +46,12 @@
         <!-- FINGER LEFT -->
         
         <joint name="${prefix}_finger_left_joint" type="prismatic">
-            <limit lower="-0.048" upper="-0.00105" effort="1.0" velocity="0.01"/>
+            <limit lower="-0.048" upper="-0.00105" effort="1.0" velocity="0.0125"/>
             <axis xyz="0 1 0"/>
             <origin xyz="0.11 0 0" rpy="0.0 0.0 0.0" /> 
             <parent link="${prefix}_base_link"/>
             <child link="${prefix}_left_finger" />
             <dynamics friction="100" damping="100" />
-            <limit effort="100" velocity="100"/>
         </joint>
 
         <transmission name="${prefix}_base_trans_left">
@@ -102,13 +101,12 @@
         <!-- FINGER RIGHT -->
         
         <joint name="${prefix}_finger_right_joint" type="prismatic">
-            <limit lower="0.00105" upper="0.048" effort="1.0" velocity="0.01"/>
+            <limit lower="0.00105" upper="0.048" effort="1.0" velocity="0.0125"/>
             <axis xyz="0 1 0"/>
             <origin xyz="0.11 0 0" rpy="0 0 0" /> 
             <parent link="${prefix}_base_link"/>
             <child link="${prefix}_right_finger" />
             <dynamics friction="100" damping="100" />
-            <limit effort="100" velocity="100"/>
         </joint>
 
         <transmission name="${prefix}_base_trans_right">
