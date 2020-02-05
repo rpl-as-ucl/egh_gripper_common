@@ -46,9 +46,9 @@
         <!-- FINGER LEFT -->
         
         <joint name="${prefix}_finger_left_joint" type="prismatic">
-            <limit lower="-0.048" upper="-0.00105" effort="1.0" velocity="0.0125"/>
-            <axis xyz="0 1 0"/>
-            <origin xyz="0.11 0 0" rpy="0.0 0.0 0.0" /> 
+            <limit lower="0.0" upper="0.048" effort="1.0" velocity="0.0125"/>
+            <axis xyz="0 -1 0"/>
+            <origin xyz="0.11 -0.013 0" rpy="0.0 0.0 0.0" /> 
             <parent link="${prefix}_base_link"/>
             <child link="${prefix}_left_finger" />
             <dynamics friction="100" damping="100" />
@@ -99,17 +99,21 @@
         </gazebo>
 
         <!-- FINGER RIGHT -->
-        
         <joint name="${prefix}_finger_right_joint" type="prismatic">
-            <limit lower="0.00105" upper="0.048" effort="1.0" velocity="0.0125"/>
+            <limit lower="0.0" upper="0.048" effort="1.0" velocity="0.0125"/>
             <axis xyz="0 1 0"/>
-            <origin xyz="0.11 0 0" rpy="0 0 0" /> 
+            <origin xyz="0.11 0.013 0" rpy="0 0 0" /> 
             <parent link="${prefix}_base_link"/>
             <child link="${prefix}_right_finger" />
             <dynamics friction="100" damping="100" />
+            <mimic joint="${prefix}_finger_left_joint" multiplier="1" offset="0"/>
         </joint>
 
-        <transmission name="${prefix}_base_trans_right">
+        <!-- 
+            The transmission is not defined cause the right finger is mirroring
+            the left finger using mimic plugin
+        -->
+        <!--transmission name="${prefix}_base_trans_right">
             <type>transmission_interface/SimpleTransmission</type>
             <actuator name="${prefix}_base_motor_right">
                 <mechanicalReduction>1</mechanicalReduction>
@@ -118,8 +122,31 @@
             <joint name="${prefix}_finger_right_joint" >
                 <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
             </joint>
-        </transmission>
+        </transmission-->
 
+        <xacro:macro name="mimic_joint_plugin_gazebo" params="parent_joint mimic_joint has_pid:=false multiplier:=1.0 offset:=0 sensitiveness:=0.0 max_effort:=1.0 robot_namespace:=''">
+            <gazebo>
+                <plugin name="${mimic_joint}_mimic_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+                    <joint>${parent_joint}</joint>
+                    <mimicJoint>${mimic_joint}</mimicJoint>
+                    <xacro:if value="${has_pid}">                    
+                    <hasPID />
+                    </xacro:if>
+                    <multiplier>${multiplier}</multiplier>
+                    <offset>${offset}</offset>
+                    <sensitiveness>${sensitiveness}</sensitiveness>   
+                    <maxEffort>${max_effort}</maxEffort>              
+                    <xacro:unless value="${robot_namespace == ''}">
+                        <robotNamespace>($robot_namespace)</robotNamespace>
+                    </xacro:unless>
+                </plugin>
+            </gazebo>
+        </xacro:macro>
+
+        <xacro:mimic_joint_plugin_gazebo parent_joint="${prefix}_finger_left_joint" 
+        mimic_joint="${prefix}_finger_right_joint" has_pid="false" multiplier="1.0" 
+        max_effort="10.0" />
+      
         <link name="${prefix}_right_finger">
             <inertial>
             <mass value="0.1" />
